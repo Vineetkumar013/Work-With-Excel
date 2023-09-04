@@ -2,23 +2,35 @@ const Exceldata = require("../model/model");
 const xlsx = require('xlsx');
 
 const createExcel = async (req, res) => {
-        try {
-        const workbook = xlsx.readFile(req.file.path);
-        const sheetName = workbook.SheetNames[0];
-        const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
-        for (let i = 0; i < jsonData.length; i++) {
-            await Exceldata.create(jsonData[i])
-        }
-        
-        res.status(200).json({
-            Total: jsonData.length,
-            msg: "Fetched the excel data successfully",
-            data: jsonData
-        });
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ error: error.message });
+  try {
+    const workbook = xlsx.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    for (let i = 0; i < jsonData.length; i++) {
+      const { mobile, ...data } = jsonData[i];
+
+      // Check if a record with the same mobile number exists in the database
+      const existingRecord = await Exceldata.findOne({ mobile });
+
+      if (existingRecord) {
+        // If a record with the same mobile number exists, update the "Rebuttal" field
+        await Exceldata.updateOne({ mobile }, { $set: { rebuttal: data.rebuttal } });
+      } else {
+        // If no record with the same mobile number exists, create a new record
+        await Exceldata.create({ mobile, ...data });
+      }
     }
+
+    res.status(200).json({
+      Total: jsonData.length,
+      msg: "Fetched the excel data successfully",
+      data: jsonData
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
 }
 
 const getAllData = async (req, res) => {
@@ -61,10 +73,25 @@ const getByIdData = async (req, res) => {
     }
 };
 
+const UpdateData = async (req, res) => {
+  try {
+      const Id = req.params.id;
+      const user = await Exceldata.findByIdAndUpdate(Id);
+
+      if (!user) {
+          return res.status(404).json({ status: 404, message: "User not found" });
+      }
+
+      res.json({ status: 200, message: "Data Updated Successfully", data: user });
+  } catch (error) {
+      res.status(500).json({ status: 500, message: error.message });
+  }
+};
+
 const deleteAllData = async (req, res) => {
   try {
     const deletedCount = await Exceldata.deleteMany({});
-    res.json({ status: 200, message: `${deletedCount} documents deleted successfully` });
+    res.json({ status: 200, message: `${deletedCount.length} documents deleted successfully` });
   } catch (error) {
     res.json({ status: 500, message: error.message });
   }
@@ -77,4 +104,5 @@ module.exports = {
     getAllData,
     getByIdData,
     deleteAllData,
+    UpdateData,
 }

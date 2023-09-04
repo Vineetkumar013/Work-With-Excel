@@ -10,6 +10,7 @@ const ExcelSchema = new mongoose.Schema({
   company: String,
   country: String,
   pinCode: String,
+  rebuttal:String
 },{timestamps:true});
 
 module.exports = mongoose.model("Exceldata", ExcelSchema);

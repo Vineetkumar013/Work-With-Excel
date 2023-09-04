@@ -84,6 +84,7 @@ function UserDataTable() {
     'Pincode',
     'Company',
     'Country',
+    "Rebuttal",
   ];
 
   return (
@@ -134,6 +135,7 @@ function UserDataTable() {
                     <td>{user.pinCode}</td>
                     <td>{user.company}</td>
                     <td>{user.country}</td>
+                    <td>{user.rebuttal}</td>
                   </tr>
                 ))}
               </tbody>
