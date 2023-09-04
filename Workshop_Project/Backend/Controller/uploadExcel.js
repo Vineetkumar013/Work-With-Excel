@@ -9,15 +9,11 @@ const createExcel = async (req, res) => {
 
     for (let i = 0; i < jsonData.length; i++) {
       const { mobile, ...data } = jsonData[i];
-
-      // Check if a record with the same mobile number exists in the database
       const existingRecord = await Exceldata.findOne({ mobile });
 
       if (existingRecord) {
-        // If a record with the same mobile number exists, update the "Rebuttal" field
         await Exceldata.updateOne({ mobile }, { $set: { rebuttal: data.rebuttal } });
       } else {
-        // If no record with the same mobile number exists, create a new record
         await Exceldata.create({ mobile, ...data });
       }
     }

@@ -7,7 +7,7 @@ function UserDataTable() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [file, setFile] = useState(null);
-  const [fileUploaded, setFileUploaded] = useState(false); // New state variable
+  const [fileUploaded, setFileUploaded] = useState(false); 
 
   const fetchData = async () => {
     try {
@@ -21,9 +21,8 @@ function UserDataTable() {
   };
 
   useEffect(() => {
-    // Fetch data using fetchData function when the component mounts
     fetchData();
-  }, [fileUploaded]); // Update data when fileUploaded changes
+  }, [fileUploaded]);
 
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
@@ -48,15 +47,9 @@ function UserDataTable() {
           'Content-Type': 'multipart/form-data',
         },
       });
-
-      // Handle the response or any other logic as needed after upload
       console.log(response.data);
-
-      // Clear the file input and reset the file state
       document.getElementById('fileInput').value = '';
       setFile(null);
-
-      // Set fileUploaded to true to trigger a data refresh
       setFileUploaded(true);
     } catch (error) {
       console.error('Error uploading file:', error);
